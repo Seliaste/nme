@@ -16,10 +16,10 @@ pub fn process_inputs(data: &mut Data) {
                         disable_raw_mode().expect("Could not disable raw mode");
                         exit(0);
                     }
-                    KeyCode::Left => data.cursor.move_left(),
-                    KeyCode::Right => data.cursor.move_right(),
-                    KeyCode::Up => data.cursor.move_up(),
-                    KeyCode::Down => data.cursor.move_down(),
+                    KeyCode::Left => data.move_left(),
+                    KeyCode::Right => data.move_right(),
+                    KeyCode::Up => data.move_up(),
+                    KeyCode::Down => data.move_down(),
                     Char(character) => {data.add_character(character)}
                     _ => {}
                 }
