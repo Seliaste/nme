@@ -20,6 +20,7 @@ pub fn process_inputs(data: &mut Data) {
                     KeyCode::Right => data.move_right(),
                     KeyCode::Up => data.move_up(),
                     KeyCode::Down => data.move_down(),
+                    KeyCode::Backspace => data.remove_character(),
                     Char(character) => {data.add_character(character)}
                     _ => {}
                 }

@@ -23,6 +23,14 @@ impl Data {
         self.cursor.character+=1;
     }
 
+    pub fn remove_character(&mut self){
+        if self.cursor.character == 0 { return; }
+        let mut line: String = self.text[self.cursor.line.clone() as usize].to_string();
+        line.remove(self.cursor.character as usize-1);
+        self.text[self.cursor.line.clone() as usize] = line;
+        self.cursor.character-=1;
+    }
+
     fn check_valid_cursor_position(&mut self){
         // if cursor is further than end of new line, move it at the end of it
         if self.cursor.character >= self.text[self.cursor.line as usize].len() as u16 {
