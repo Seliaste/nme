@@ -2,6 +2,7 @@ use std::io::stdout;
 use std::process::exit;
 use crossterm::{event, ExecutableCommand};
 use crossterm::event::{KeyCode, KeyEventKind};
+use crossterm::event::KeyCode::Char;
 use crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
 use crate::data::data::Data;
 
@@ -10,7 +11,7 @@ pub fn process_inputs(data: &mut Data) {
         if let event::Event::Key(key) = event::read().expect("Could not read event") {
             if key.kind == KeyEventKind::Press {
                 match key.code {
-                    KeyCode::Char('q') => {
+                    KeyCode::Esc => {
                         stdout().execute(LeaveAlternateScreen).expect("Could not leave alternate screen");
                         disable_raw_mode().expect("Could not disable raw mode");
                         exit(0);
@@ -19,6 +20,7 @@ pub fn process_inputs(data: &mut Data) {
                     KeyCode::Right => data.cursor.move_right(),
                     KeyCode::Up => data.cursor.move_up(),
                     KeyCode::Down => data.cursor.move_down(),
+                    Char(character) => {data.add_character(character)}
                     _ => {}
                 }
             }
