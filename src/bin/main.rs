@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use crossterm::{
     terminal::{enable_raw_mode, EnterAlternateScreen,
     },
@@ -7,7 +7,7 @@ use crossterm::{
 use ratatui::{
     prelude::{CrosstermBackend, Terminal},
 };
-use std::io::{stdout, Result, Read};
+use std::io::{stdout, Result};
 use nme::arguments::parse_file_args;
 use nme::data::data::Data;
 use nme::input::input::process_inputs;
@@ -19,13 +19,9 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    let mut data = Data::new();
-
     let filename = parse_file_args().expect("Please specify a file to open");
-    let mut text = String::new();
-    let mut file = File::open(filename).expect("Could not open file");
-    file.read_to_string(&mut text).expect("Could not read file");
-    data.text = text.split("\n").map(str::to_string).collect();
+    let file = OpenOptions::new().write(true).read(true).open(filename).expect("Could not open file");
+    let mut data = Data::new(file);
 
     loop {
         process_inputs(&mut data);

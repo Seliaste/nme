@@ -1,7 +1,10 @@
+use std::fs::File;
+use std::io::{Read, Seek, Write};
 use crate::data::cursor::TextCursor;
 
 
 pub struct Data {
+    pub file: File,
     pub text: Vec<String>,
     pub cursor: TextCursor,
     has_tmp_cursor: bool,
@@ -9,8 +12,13 @@ pub struct Data {
 }
 
 impl Data {
-    pub fn new()-> Data{
-        Data{text:vec![],cursor:TextCursor { line: 0, character: 0 }, has_tmp_cursor:false,tmp_cursor_character:0}
+    pub fn new(mut file: File) -> Data{
+        let mut text = String::new();
+        file.read_to_string(&mut text).expect("Could not read file");
+        Data{file,
+            text:text.split("\n").map(str::to_string).collect(),
+            cursor:TextCursor { line: 0, character: 0 },
+            has_tmp_cursor:false,tmp_cursor_character:0}
     }
     pub fn add_character(&mut self, character: char){
         self.has_tmp_cursor = false;
@@ -68,5 +76,11 @@ impl Data {
     pub fn move_left(&mut self) {
         self.has_tmp_cursor = false;
         if self.cursor.character != 0 {self.cursor.character -= 1;}
+    }
+
+    pub fn save(&mut self) {
+        self.file.set_len(0).expect("Could not truncate file before writing");
+        self.file.rewind().expect("Could not rewind file to save");
+        self.file.write(self.text.join("\n").as_bytes()).expect("Could not save file");
     }
 }

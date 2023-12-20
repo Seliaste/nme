@@ -1,7 +1,7 @@
 use std::io::stdout;
 use std::process::exit;
 use crossterm::{event, ExecutableCommand};
-use crossterm::event::{KeyCode, KeyEventKind};
+use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
 use crossterm::event::KeyCode::Char;
 use crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
 use crate::data::data::Data;
@@ -21,6 +21,7 @@ pub fn process_inputs(data: &mut Data) {
                     KeyCode::Up => data.move_up(),
                     KeyCode::Down => data.move_down(),
                     KeyCode::Backspace => data.remove_character(),
+                    KeyCode::F(1) => data.save(),
                     Char(character) => {data.add_character(character)}
                     _ => {}
                 }
