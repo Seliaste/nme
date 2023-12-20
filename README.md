@@ -1,2 +1,2 @@
 # nme
-A easy-to-use terminal text editor made in Rust
+A easy-to-use non modal (unlike Vim) terminal text editor made in Rust
