@@ -9,7 +9,6 @@ use ratatui::{
 };
 use std::io::{stdout, Result, Read};
 use nme::arguments::parse_file_args;
-use nme::data::cursor::TextCursor;
 use nme::data::data::Data;
 use nme::input::input::process_inputs;
 use nme::tui::main::display;
@@ -20,7 +19,7 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    let mut data = Data { text: vec![], cursor: TextCursor { line: 0, character: 0 } };
+    let mut data = Data::new();
 
     let filename = parse_file_args().expect("Please specify a file to open");
     let mut text = String::new();
