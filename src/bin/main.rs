@@ -1,3 +1,6 @@
+use std::fs::File;
+use nme::arguments;
+
 use crossterm::{
     event::{self, KeyCode, KeyEventKind},
     terminal::{
@@ -7,10 +10,11 @@ use crossterm::{
     ExecutableCommand,
 };
 use ratatui::{
-    prelude::{CrosstermBackend, Stylize, Terminal},
+    prelude::{CrosstermBackend, Terminal},
     widgets::Paragraph,
 };
-use std::io::{stdout, Result};
+use std::io::{stdout, Result, Read};
+use crate::arguments::parse_file_args;
 
 fn main() -> Result<()> {
     stdout().execute(EnterAlternateScreen)?;
@@ -18,13 +22,16 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
+    let filename = parse_file_args().expect("Please specify a file to open");
+    let mut text= String::new();
+    let mut file = File::open(filename).expect("Could not open file");
+    file.read_to_string(&mut text).expect("Could not read file");
     loop {
         terminal.draw(|frame| {
             let area = frame.size();
+
             frame.render_widget(
-                Paragraph::new("Hello Ratatui! (press 'q' to quit)")
-                    .white()
-                    .on_blue(),
+                Paragraph::new(text.clone()),
                 area,
             );
         })?;
