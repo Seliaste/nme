@@ -7,5 +7,5 @@ pub fn parse_file_args() -> Option<String>
         Some(args[args.len() - 1].to_string()) // last argument
     } else {
         None
-    }
+    };
 }
