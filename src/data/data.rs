@@ -1,7 +1,6 @@
 use crate::data::cursor::TextCursor;
 use std::fs::File;
 use std::io::{Read, Seek, Write};
-use std::ops::IndexMut;
 use std::usize;
 
 pub struct Data {
@@ -28,10 +27,14 @@ impl Data {
         }
     }
 
+    fn get_text_after_cusor(&self) -> &str{
+        let res = &self.text.get(self.cursor.line as usize).unwrap();
+        &res[self.cursor.character as usize..]
+    }
+
     pub fn add_line(&mut self) {
         self.has_tmp_cursor = false;
-        let to_newline = &self.text.get(self.cursor.line as usize).unwrap();
-        let to_newline = &to_newline[self.cursor.character as usize..];
+        let to_newline = self.get_text_after_cusor();
 
         self.text
             .insert(self.cursor.line as usize + 1, to_newline.to_string());
@@ -46,6 +49,18 @@ impl Data {
         self.check_valid_cursor_position();
     }
 
+    pub fn del_line(&mut self) {
+        self.has_tmp_cursor = false;
+        let to_be_brought_up = self.get_text_after_cusor();
+        let mut new_line =self.text.get(self.cursor.line as usize -1).unwrap().to_owned();
+        let old_line_size = new_line.len();
+        new_line.push_str(to_be_brought_up);
+        self.text[self.cursor.line as usize-1] = new_line;
+        self.text.remove(self.cursor.line as usize);
+        self.cursor.line -= 1;
+        self.cursor.character = old_line_size as u16;
+    }
+
     pub fn add_character(&mut self, character: char) {
         self.has_tmp_cursor = false;
         if self.cursor.line > self.text.len() as u16 {
@@ -58,7 +73,10 @@ impl Data {
     }
 
     pub fn remove_character(&mut self) {
+
         if self.cursor.character == 0 {
+            if self.cursor.line == 0 {return;}
+            self.del_line();
             return;
         }
         let mut line: String = self.text[self.cursor.line.clone() as usize].to_string();
