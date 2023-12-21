@@ -1,4 +1,5 @@
 pub mod arguments;
-pub mod tui;
-pub mod input;
+pub mod config;
 pub mod data;
+pub mod input;
+pub mod tui;
