@@ -2,7 +2,7 @@ use crate::config::action::Action;
 use crate::config::config::Config;
 use crate::data::data::Data;
 use crossterm::event::KeyCode::Char;
-use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
+use crossterm::event::{KeyEvent, KeyEventKind};
 use crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
 use crossterm::{event, ExecutableCommand};
 use std::io::stdout;
@@ -31,13 +31,10 @@ fn handle_key_inputs(key_event: KeyEvent, data: &mut Data, config: &mut Config) 
                 disable_raw_mode().expect("Could not disable raw mode");
                 exit(0);
             }
-        }
-    } else {
-        match key_event.code {
-            Char(char) => data.add_character(char),
-            // not a keybinding and not a character
             _ => {}
         }
+    } else if let Char(char) = key_event.code {
+        data.add_character(char);
     }
 }
 

@@ -1,0 +1,8 @@
+[keybindings]
+deletechar = "backspace"
+moveup = "up"
+movedown = "down"
+moveleft = "left"
+moveright = "right"
+addline = "enter"
+exit = "escape"

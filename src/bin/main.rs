@@ -8,7 +8,7 @@ use nme::data::data::Data;
 use nme::input::input::process_inputs;
 use nme::tui::main::display;
 use ratatui::prelude::{CrosstermBackend, Terminal};
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::{stdout, Result};
 
 fn main() -> Result<()> {
@@ -25,7 +25,8 @@ fn main() -> Result<()> {
         .expect("Could not open file");
     let mut data = Data::new(file);
     // TODO: change this when done testing
-    let mut config = Config::testing();
+    // let mut config = Config::testing();
+    let mut config = Config::from("./config.toml");
 
     loop {
         process_inputs(&mut data, &mut config);

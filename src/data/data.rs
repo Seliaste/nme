@@ -17,7 +17,7 @@ impl Data {
         file.read_to_string(&mut text).expect("Could not read file");
         Data {
             file,
-            text: text.split("\n").map(str::to_string).collect(),
+            text: text.split('\n').map(str::to_string).collect(),
             cursor: TextCursor {
                 line: 0,
                 character: 0,
@@ -27,7 +27,7 @@ impl Data {
         }
     }
 
-    fn get_text_after_cusor(&self) -> &str{
+    fn get_text_after_cusor(&self) -> &str {
         let res = &self.text.get(self.cursor.line as usize).unwrap();
         &res[self.cursor.character as usize..]
     }
@@ -52,10 +52,14 @@ impl Data {
     pub fn del_line(&mut self) {
         self.has_tmp_cursor = false;
         let to_be_brought_up = self.get_text_after_cusor();
-        let mut new_line =self.text.get(self.cursor.line as usize -1).unwrap().to_owned();
+        let mut new_line = self
+            .text
+            .get(self.cursor.line as usize - 1)
+            .unwrap()
+            .to_owned();
         let old_line_size = new_line.len();
         new_line.push_str(to_be_brought_up);
-        self.text[self.cursor.line as usize-1] = new_line;
+        self.text[self.cursor.line as usize - 1] = new_line;
         self.text.remove(self.cursor.line as usize);
         self.cursor.line -= 1;
         self.cursor.character = old_line_size as u16;
@@ -66,22 +70,23 @@ impl Data {
         if self.cursor.line > self.text.len() as u16 {
             self.text.insert(self.cursor.line as usize, "".to_string())
         }
-        let mut line: String = self.text[self.cursor.line.clone() as usize].to_string();
+        let mut line: String = self.text[self.cursor.line as usize].to_string();
         line.insert(self.cursor.character as usize, character);
-        self.text[self.cursor.line.clone() as usize] = line;
+        self.text[self.cursor.line as usize] = line;
         self.cursor.character += 1;
     }
 
     pub fn remove_character(&mut self) {
-
         if self.cursor.character == 0 {
-            if self.cursor.line == 0 {return;}
+            if self.cursor.line == 0 {
+                return;
+            }
             self.del_line();
             return;
         }
-        let mut line: String = self.text[self.cursor.line.clone() as usize].to_string();
+        let mut line: String = self.text[self.cursor.line as usize].to_string();
         line.remove(self.cursor.character as usize - 1);
-        self.text[self.cursor.line.clone() as usize] = line;
+        self.text[self.cursor.line as usize] = line;
         self.cursor.character -= 1;
     }
 
@@ -131,7 +136,7 @@ impl Data {
             .expect("Could not truncate file before writing");
         self.file.rewind().expect("Could not rewind file to save");
         self.file
-            .write(self.text.join("\n").as_bytes())
+            .write_all(self.text.join("\n").as_bytes())
             .expect("Could not save file");
     }
 }

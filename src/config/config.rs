@@ -1,8 +1,21 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fs};
 
 use crossterm::event::KeyCode;
+use serde::Deserialize;
+use toml::Value;
 
 use super::action::Action;
+
+#[derive(Deserialize, Debug)]
+struct Data {
+    pub keybindings: HashMap<String, Value>,
+}
+
+#[derive(Deserialize, Debug)]
+struct ConfigFile {
+    // pub keybindings: HashMap<String, Value>,
+    // pub deletechar: String,
+}
 
 pub struct Config {
     pub keymaps: HashMap<Action, KeyCode>,
@@ -31,9 +44,47 @@ impl Config {
     }
 
     // TODO: implement this
-    pub fn from() -> Self {
-        Self {
-            keymaps: HashMap::new(),
+    pub fn from(path: &str) -> Self {
+        let content = match fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(_) => String::from(""),
+        };
+        let data: Data = match toml::from_str(&content) {
+            Ok(d) => d,
+            Err(_) => Data {
+                keybindings: HashMap::new(),
+            },
+        };
+        let mut keybindings = HashMap::new();
+        for (shortcut, keymap) in data.keybindings.iter() {
+            let action: Action = (*shortcut).clone().into();
+            let keycode_str = keymap.as_str().unwrap().to_string();
+            let keycode = string_to_keycode(&keycode_str);
+            keybindings.insert(action, keycode);
         }
+        Self {
+            keymaps: keybindings,
+        }
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+//TODO: too tedious, find another way (maybe with serde?)
+fn string_to_keycode(value: &str) -> KeyCode {
+    match value.to_lowercase().as_str() {
+        "backspace" => KeyCode::Backspace,
+        "f1" => KeyCode::F(1),
+        "enter" => KeyCode::Enter,
+        "down" => KeyCode::Down,
+        "up" => KeyCode::Up,
+        "left" => KeyCode::Left,
+        "right" => KeyCode::Right,
+        "escape" => KeyCode::Esc,
+        _ => KeyCode::Null,
     }
 }
