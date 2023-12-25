@@ -10,11 +10,11 @@ use std::process::exit;
 
 fn handle_key_inputs(key_event: KeyEvent, data: &mut Data, config: &mut Config) {
     let key = config
-        .keymaps
+        .keybindings
         .iter()
-        .find(|(_name, key)| **key == key_event.code);
+        .find(|(keycode, _)| **keycode == key_event.code);
 
-    if let Some((action, _)) = key {
+    if let Some((_, action)) = key {
         match action {
             Action::DeleteLine => {}
             Action::SaveFile => data.save(),

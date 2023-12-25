@@ -1,4 +1,6 @@
-#[derive(Debug, Hash, PartialEq, Eq)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Hash, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Action {
     AddLine,
     DeleteLine,

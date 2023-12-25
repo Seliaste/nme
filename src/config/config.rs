@@ -1,45 +1,20 @@
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, process::exit};
 
 use crossterm::event::KeyCode;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use toml::Value;
 
 use super::action::Action;
 
-#[derive(Deserialize, Debug)]
-struct Data {
-    pub keybindings: HashMap<String, Value>,
-}
-
-#[derive(Deserialize, Debug)]
-struct ConfigFile {
-    // pub keybindings: HashMap<String, Value>,
-    // pub deletechar: String,
-}
-
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Config {
-    pub keymaps: HashMap<Action, KeyCode>,
+    pub keybindings: HashMap<KeyCode, Action>,
 }
 
 impl Config {
-    pub fn testing() -> Self {
-        let mut k = HashMap::new();
-        // Testing Defaults
-        k.insert(Action::DeleteLine, KeyCode::Char('d'));
-        k.insert(Action::Exit, KeyCode::Esc);
-        k.insert(Action::MoveUp, KeyCode::Up);
-        k.insert(Action::MoveDown, KeyCode::Down);
-        k.insert(Action::MoveLeft, KeyCode::Left);
-        k.insert(Action::MoveRight, KeyCode::Right);
-        k.insert(Action::AddLine, KeyCode::Enter);
-        k.insert(Action::DeleteChar, KeyCode::Backspace);
-        k.insert(Action::SaveFile, KeyCode::F(1));
-        Self { keymaps: k }
-    }
-
     pub fn new() -> Self {
         Self {
-            keymaps: HashMap::new(),
+            keybindings: HashMap::new(),
         }
     }
 
@@ -49,21 +24,25 @@ impl Config {
             Ok(c) => c,
             Err(_) => String::from(""),
         };
-        let data: Data = match toml::from_str(&content) {
+        let data: Value = match toml::from_str(&content) {
             Ok(d) => d,
-            Err(_) => Data {
-                keybindings: HashMap::new(),
-            },
+            Err(_) => Value::Integer(0),
         };
-        let mut keybindings = HashMap::new();
-        for (shortcut, keymap) in data.keybindings.iter() {
-            let action: Action = (*shortcut).clone().into();
-            let keycode_str = keymap.as_str().unwrap().to_string();
-            let keycode = string_to_keycode(&keycode_str);
-            keybindings.insert(action, keycode);
+        let keybindings = data
+            .as_table()
+            .unwrap()
+            .get("keybindings")
+            .unwrap()
+            .as_table()
+            .unwrap();
+        let mut keybindings_map = HashMap::new();
+        for (action, keycode) in keybindings.iter() {
+            let action = Action::from(action.clone().to_owned());
+            let keycode = string_to_keycode(keycode.as_str().unwrap());
+            keybindings_map.insert(keycode, action);
         }
         Self {
-            keymaps: keybindings,
+            keybindings: keybindings_map,
         }
     }
 }
