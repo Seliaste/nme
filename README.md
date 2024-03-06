@@ -1,4 +1,4 @@
-## warning: this is not working yet. instructions on how to run will be added later once this has basic features
+## warning: this project has been archived and moved to https://codeberg.org/Seliaste/nme
 
 # nme
 
